@@ -1,8 +1,8 @@
-# Freestanding Expression Macro
+# Attached Member Macro
 
-![AppIcon128](Images/AppIcon128.png) This is the **completed source code** for the video on creating a Freestanding Expression Macro
+![AppIcon128](Images/AppIcon128.png) This is the **completed source code** for the video on creating an Attached Member Macro
 
-Check out the **AttachedMacro** branch for the completed source code for that type of macro.
+Check out the **FreestandingExpressionMacro** branch for the completed source code for that type of macro.
 
 If you want to support my work, you can - </br>
 
