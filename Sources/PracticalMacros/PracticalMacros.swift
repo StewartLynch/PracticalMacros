@@ -7,5 +7,13 @@
 ///     #stringify(x + y)
 ///
 /// produces a tuple `(x + y, "x + y")`.
+///
+
+import Foundation
+
+
 @freestanding(expression)
 public macro stringify<T>(_ value: T) -> (T, String) = #externalMacro(module: "PracticalMacrosMacros", type: "StringifyMacro")
+
+@freestanding(expression)
+public macro URL(_ stringLiteral: String) -> URL = #externalMacro(module: "PracticalMacrosMacros", type: "URLMacro")
