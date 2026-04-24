@@ -25,7 +25,7 @@ public struct URLMacro: ExpressionMacro {
         let severity: SwiftDiagnostics.DiagnosticSeverity
         
         static let expectedStringLiteral = URLMacroDiagnostic(
-            message: "The #URL macro requires a sttic string literal.",
+            message: "The #URL macro requires a static string literal.",
             diagnosticID: MessageID(domain: "PracticalMacros.URLMacro", id: "expectedStringLiteral"),
             severity: .error
         )
