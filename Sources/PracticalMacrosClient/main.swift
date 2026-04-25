@@ -14,7 +14,7 @@ import Foundation
 //let url = #URL("https://createchsol.com")
 //print(url)
 @CaseIdentifiable
-enum Screen{
+enum Screen {
     case home, settings
     case profile(userID: Int)
     

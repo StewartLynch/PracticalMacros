@@ -64,8 +64,7 @@ public struct URLMacro: ExpressionMacro {
 }
 
 public struct CaseIdentifiableMacro: MemberMacro, ExtensionMacro {
-    
-    
+       
     struct CaseIdentfiableDiagnostic: DiagnosticMessage {
         let message: String
         let diagnosticID: SwiftDiagnostics.MessageID
@@ -85,6 +84,14 @@ public struct CaseIdentifiableMacro: MemberMacro, ExtensionMacro {
             diagnosticID: MessageID(
                 domain: "PracticalMacroMacros.CaseIdentifiableMacro",
                 id: "requiresAtLeastOneCase"
+            ),
+            severity: .error
+        )
+        static let alreadyConformsToIdentifiable = CaseIdentfiableDiagnostic(
+            message: "@CaseIdentifiable already assigned Identifiable conformance",
+            diagnosticID: MessageID(
+                domain: "PracticalMacroMacros.CaseIdentifiableMacro",
+                id: "alreadyConformsToIdentifiable"
             ),
             severity: .error
         )
@@ -137,6 +144,20 @@ public struct CaseIdentifiableMacro: MemberMacro, ExtensionMacro {
         return [idProperty]
     }
     
+    // Added for detecting duplicate conformance
+    private static func existingIdentifiableConformance(
+        in enumDeclaration: EnumDeclSyntax
+    ) -> InheritedTypeSyntax? {
+        enumDeclaration.inheritanceClause?.inheritedTypes.first { inheritedType in
+            let typeName = inheritedType.type
+                .trimmed
+                .description
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            return typeName == "Identifiable" || typeName == "Swift.Identifiable"
+        }
+    }
+    
     public static func expansion(
         of node: SwiftSyntax.AttributeSyntax,
         attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
@@ -153,6 +174,18 @@ public struct CaseIdentifiableMacro: MemberMacro, ExtensionMacro {
             )
             return []
         }
+        
+        // Checking for duplicate conformance
+        if let existingConformance = existingIdentifiableConformance(in: enumDeclaration) {
+            context.diagnose(
+                Diagnostic(
+                    node: Syntax(existingConformance),
+                    message: CaseIdentfiableDiagnostic.alreadyConformsToIdentifiable
+                )
+            )
+            return []
+        }
+        
         return [
             try ExtensionDeclSyntax("extension \(type.trimmed): Identifiable {}")
         ]
