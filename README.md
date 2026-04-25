@@ -1,8 +1,8 @@
 # Attached Member Macro
 
-![AppIcon128](Images/AppIcon128.png) This is the **completed source code** for the video on creating an Attached Member Macro
-
-Check out the **FreestandingExpressionMacro** branch for the completed source code for that type of macro.
+![AppIcon128](Images/AppIcon128.png) 
+This is a bonus branch that adds to the content in the video for an Attached macror with both member and conformance.
+This code ensure that there iw no duplicatioin of the Identifiable protocol.
 
 If you want to support my work, you can - </br>
 
