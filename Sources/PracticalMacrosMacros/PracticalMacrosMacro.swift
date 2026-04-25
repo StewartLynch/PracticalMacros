@@ -61,14 +61,109 @@ public struct URLMacro: ExpressionMacro {
         }
         return "URL(string: \(literal))!"
     }
+}
+
+public struct CaseIdentifiableMacro: MemberMacro, ExtensionMacro {
     
     
+    struct CaseIdentfiableDiagnostic: DiagnosticMessage {
+        let message: String
+        let diagnosticID: SwiftDiagnostics.MessageID
+        let severity: SwiftDiagnostics.DiagnosticSeverity
+        
+        static let onlyAppliesToEnums = CaseIdentfiableDiagnostic(
+            message: "@CaseIdentifiable only applies to enums",
+            diagnosticID: MessageID(
+                domain: "PracticalMacroMacros.CaseIdentifiableMacro",
+                id: "onlyAppliesToEnums"
+            ),
+            severity: .error
+        )
+
+        static let requiresAtLeastOneCase = CaseIdentfiableDiagnostic(
+            message: "@CaseIdentifiable requires an enum with at least one case",
+            diagnosticID: MessageID(
+                domain: "PracticalMacroMacros.CaseIdentifiableMacro",
+                id: "requiresAtLeastOneCase"
+            ),
+            severity: .error
+        )
+
+    }
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingMembersOf declaration: some DeclGroupSyntax,
+        conformingTo protocols: [TypeSyntax],
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        guard let enumDeclaration = declaration.as(EnumDeclSyntax.self) else {
+            context.diagnose(
+                Diagnostic(
+                    node: Syntax(declaration),
+                    message: CaseIdentfiableDiagnostic.onlyAppliesToEnums
+                )
+            )
+            return []
+        }
+        let cases = declaration.memberBlock.members.compactMap { member in
+            member.decl.as(EnumCaseDeclSyntax.self)
+        }
+        let caseElements = cases.flatMap(\.elements)
+        guard !caseElements.isEmpty else {
+            context.diagnose(
+                Diagnostic(
+                    node: Syntax(enumDeclaration.name),
+                    message: CaseIdentfiableDiagnostic.requiresAtLeastOneCase
+                )
+            )
+            return []
+        }
+        let switchCases = caseElements.map { caseElement in
+            let caseName = caseElement.name.text
+            return
+                """
+                case .\(caseName)
+                    "\(caseName)"
+                """
+        }.joined(separator: "\n")
+        let idProperty: DeclSyntax =
+        """
+        public var id: String {
+            switch self {
+              \(raw: switchCases)
+            }
+        }
+        """
+        return [idProperty]
+    }
+    
+    public static func expansion(
+        of node: SwiftSyntax.AttributeSyntax,
+        attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
+        providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol,
+        conformingTo protocols: [SwiftSyntax.TypeSyntax],
+        in context: some SwiftSyntaxMacros.MacroExpansionContext
+    ) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
+        guard let enumDeclaration = declaration.as(EnumDeclSyntax.self) else {
+            context.diagnose(
+                Diagnostic(
+                    node: Syntax(declaration),
+                    message: CaseIdentfiableDiagnostic.onlyAppliesToEnums
+                )
+            )
+            return []
+        }
+        return [
+            try ExtensionDeclSyntax("extension \(type.trimmed): Identifiable {}")
+        ]
+    }
 }
 
 @main
 struct PracticalMacrosPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         StringifyMacro.self,
-        URLMacro.self
+        URLMacro.self,
+        CaseIdentifiableMacro.self
     ]
 }
