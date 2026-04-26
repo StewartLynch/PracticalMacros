@@ -129,7 +129,7 @@ public struct CaseIdentifiableMacro: MemberMacro, ExtensionMacro {
             let caseName = caseElement.name.text
             return
                 """
-                case .\(caseName)
+                case .\(caseName):
                     "\(caseName)"
                 """
         }.joined(separator: "\n")
