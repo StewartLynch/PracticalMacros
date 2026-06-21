@@ -2,6 +2,10 @@
 
 ![AppIcon128](Images/AppIcon128.png) This is the **completed source code** for the video on creating a Freestanding Expression Macro
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=7W6R2TIoEW8
+" target="_blank"><img src="http://img.youtube.com/vi/7W6R2TIoEW8/0.jpg" 
+alt="Free Standing Macro" width="480" height="360" border="1" /></a>
+
 Check out the **AttachedMacro** branch for the completed source code for that type of macro.
 
 If you want to support my work, you can - </br>
